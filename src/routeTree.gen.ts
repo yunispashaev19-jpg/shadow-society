@@ -16,6 +16,9 @@ import { Route as HowToPlayRouteImport } from './routes/how-to-play'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated/rooms'
+import { Route as AuthenticatedGameGameIdRouteImport } from './routes/_authenticated/game.$gameId'
+import { Route as AuthenticatedResultsGameIdRouteImport } from './routes/_authenticated/results.$gameId'
+import { Route as AuthenticatedRoomCodeRouteImport } from './routes/_authenticated/room.$code'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -51,6 +54,22 @@ const AuthenticatedRoomsRoute = AuthenticatedRoomsRouteImport.update({
   path: '/rooms',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedGameGameIdRoute = AuthenticatedGameGameIdRouteImport.update({
+  id: '/game/$gameId',
+  path: '/game/$gameId',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedResultsGameIdRoute =
+  AuthenticatedResultsGameIdRouteImport.update({
+    id: '/results/$gameId',
+    path: '/results/$gameId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedRoomCodeRoute = AuthenticatedRoomCodeRouteImport.update({
+  id: '/room/$code',
+  path: '/room/$code',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -59,6 +78,9 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/rooms': typeof AuthenticatedRoomsRoute
+  '/game/$gameId': typeof AuthenticatedGameGameIdRoute
+  '/results/$gameId': typeof AuthenticatedResultsGameIdRoute
+  '/room/$code': typeof AuthenticatedRoomCodeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -67,6 +89,9 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/rooms': typeof AuthenticatedRoomsRoute
+  '/game/$gameId': typeof AuthenticatedGameGameIdRoute
+  '/results/$gameId': typeof AuthenticatedResultsGameIdRoute
+  '/room/$code': typeof AuthenticatedRoomCodeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,14 +102,33 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
+  '/_authenticated/game/$gameId': typeof AuthenticatedGameGameIdRoute
+  '/_authenticated/results/$gameId': typeof AuthenticatedResultsGameIdRoute
+  '/_authenticated/room/$code': typeof AuthenticatedRoomCodeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/auth' | '/how-to-play' | '/reset-password' | '/dashboard' | '/rooms'
+    | '/'
+    | '/auth'
+    | '/how-to-play'
+    | '/reset-password'
+    | '/dashboard'
+    | '/rooms'
+    | '/game/$gameId'
+    | '/results/$gameId'
+    | '/room/$code'
   fileRoutesByTo: FileRoutesByTo
   to:
-    '/' | '/auth' | '/how-to-play' | '/reset-password' | '/dashboard' | '/rooms'
+    | '/'
+    | '/auth'
+    | '/how-to-play'
+    | '/reset-password'
+    | '/dashboard'
+    | '/rooms'
+    | '/game/$gameId'
+    | '/results/$gameId'
+    | '/room/$code'
   id:
     | '__root__'
     | '/'
@@ -94,6 +138,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/_authenticated/dashboard'
     | '/_authenticated/rooms'
+    | '/_authenticated/game/$gameId'
+    | '/_authenticated/results/$gameId'
+    | '/_authenticated/room/$code'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -155,17 +202,44 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRoomsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/game/$gameId': {
+      id: '/_authenticated/game/$gameId'
+      path: '/game/$gameId'
+      fullPath: '/game/$gameId'
+      preLoaderRoute: typeof AuthenticatedGameGameIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/results/$gameId': {
+      id: '/_authenticated/results/$gameId'
+      path: '/results/$gameId'
+      fullPath: '/results/$gameId'
+      preLoaderRoute: typeof AuthenticatedResultsGameIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/room/$code': {
+      id: '/_authenticated/room/$code'
+      path: '/room/$code'
+      fullPath: '/room/$code'
+      preLoaderRoute: typeof AuthenticatedRoomCodeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
+  AuthenticatedGameGameIdRoute: typeof AuthenticatedGameGameIdRoute
+  AuthenticatedResultsGameIdRoute: typeof AuthenticatedResultsGameIdRoute
+  AuthenticatedRoomCodeRoute: typeof AuthenticatedRoomCodeRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
+  AuthenticatedGameGameIdRoute: AuthenticatedGameGameIdRoute,
+  AuthenticatedResultsGameIdRoute: AuthenticatedResultsGameIdRoute,
+  AuthenticatedRoomCodeRoute: AuthenticatedRoomCodeRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
