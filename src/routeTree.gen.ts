@@ -18,6 +18,8 @@ import { Route as AuthenticatedDashboardRouteImport } from './routes/_authentica
 import { Route as AuthenticatedLeaderboardRouteImport } from './routes/_authenticated/leaderboard'
 import { Route as AuthenticatedProfileRouteImport } from './routes/_authenticated/profile'
 import { Route as AuthenticatedRoomsRouteImport } from './routes/_authenticated/rooms'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedShopRouteImport } from './routes/_authenticated/shop'
 import { Route as AuthenticatedGameGameIdRouteImport } from './routes/_authenticated/game.$gameId'
 import { Route as AuthenticatedResultsGameIdRouteImport } from './routes/_authenticated/results.$gameId'
 import { Route as AuthenticatedRoomCodeRouteImport } from './routes/_authenticated/room.$code'
@@ -67,6 +69,16 @@ const AuthenticatedRoomsRoute = AuthenticatedRoomsRouteImport.update({
   path: '/rooms',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedShopRoute = AuthenticatedShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedGameGameIdRoute = AuthenticatedGameGameIdRouteImport.update({
   id: '/game/$gameId',
   path: '/game/$gameId',
@@ -93,6 +105,8 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/rooms': typeof AuthenticatedRoomsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/shop': typeof AuthenticatedShopRoute
   '/game/$gameId': typeof AuthenticatedGameGameIdRoute
   '/results/$gameId': typeof AuthenticatedResultsGameIdRoute
   '/room/$code': typeof AuthenticatedRoomCodeRoute
@@ -106,6 +120,8 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/profile': typeof AuthenticatedProfileRoute
   '/rooms': typeof AuthenticatedRoomsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/shop': typeof AuthenticatedShopRoute
   '/game/$gameId': typeof AuthenticatedGameGameIdRoute
   '/results/$gameId': typeof AuthenticatedResultsGameIdRoute
   '/room/$code': typeof AuthenticatedRoomCodeRoute
@@ -121,6 +137,8 @@ export interface FileRoutesById {
   '/_authenticated/leaderboard': typeof AuthenticatedLeaderboardRoute
   '/_authenticated/profile': typeof AuthenticatedProfileRoute
   '/_authenticated/rooms': typeof AuthenticatedRoomsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/shop': typeof AuthenticatedShopRoute
   '/_authenticated/game/$gameId': typeof AuthenticatedGameGameIdRoute
   '/_authenticated/results/$gameId': typeof AuthenticatedResultsGameIdRoute
   '/_authenticated/room/$code': typeof AuthenticatedRoomCodeRoute
@@ -136,6 +154,8 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/profile'
     | '/rooms'
+    | '/settings'
+    | '/shop'
     | '/game/$gameId'
     | '/results/$gameId'
     | '/room/$code'
@@ -149,6 +169,8 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/profile'
     | '/rooms'
+    | '/settings'
+    | '/shop'
     | '/game/$gameId'
     | '/results/$gameId'
     | '/room/$code'
@@ -163,6 +185,8 @@ export interface FileRouteTypes {
     | '/_authenticated/leaderboard'
     | '/_authenticated/profile'
     | '/_authenticated/rooms'
+    | '/_authenticated/settings'
+    | '/_authenticated/shop'
     | '/_authenticated/game/$gameId'
     | '/_authenticated/results/$gameId'
     | '/_authenticated/room/$code'
@@ -241,6 +265,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRoomsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/shop': {
+      id: '/_authenticated/shop'
+      path: '/shop'
+      fullPath: '/shop'
+      preLoaderRoute: typeof AuthenticatedShopRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/game/$gameId': {
       id: '/_authenticated/game/$gameId'
       path: '/game/$gameId'
@@ -270,6 +308,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedLeaderboardRoute: typeof AuthenticatedLeaderboardRoute
   AuthenticatedProfileRoute: typeof AuthenticatedProfileRoute
   AuthenticatedRoomsRoute: typeof AuthenticatedRoomsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedShopRoute: typeof AuthenticatedShopRoute
   AuthenticatedGameGameIdRoute: typeof AuthenticatedGameGameIdRoute
   AuthenticatedResultsGameIdRoute: typeof AuthenticatedResultsGameIdRoute
   AuthenticatedRoomCodeRoute: typeof AuthenticatedRoomCodeRoute
@@ -280,6 +320,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedLeaderboardRoute: AuthenticatedLeaderboardRoute,
   AuthenticatedProfileRoute: AuthenticatedProfileRoute,
   AuthenticatedRoomsRoute: AuthenticatedRoomsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedShopRoute: AuthenticatedShopRoute,
   AuthenticatedGameGameIdRoute: AuthenticatedGameGameIdRoute,
   AuthenticatedResultsGameIdRoute: AuthenticatedResultsGameIdRoute,
   AuthenticatedRoomCodeRoute: AuthenticatedRoomCodeRoute,
