@@ -61,7 +61,7 @@ function LeaderboardPage() {
       </header>
 
       <div className="panel mt-6 divide-y divide-border">
-        {rows.map((p, i) => {
+        {rows.map((p) => {
           const rank = (board.data ?? []).indexOf(p) + 1;
           const winRate = p.games_played ? Math.round((p.wins / p.games_played) * 100) : 0;
           return (
@@ -97,12 +97,7 @@ function LeaderboardPage() {
         {rows.length === 0 && (
           <p className="px-4 py-6 text-sm text-muted-foreground">No players found.</p>
         )}
-        {i0(rows.length)}
       </div>
     </AppShell>
   );
-}
-
-function i0(_n: number) {
-  return null;
 }
