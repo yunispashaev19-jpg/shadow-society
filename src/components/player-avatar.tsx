@@ -24,11 +24,11 @@ export function PlayerAvatar({
   className,
 }: {
   name: string;
-  avatarKey?: string;
-  frameKey?: string;
-  size?: "sm" | "md" | "lg" | "xl";
-  dimmed?: boolean;
-  className?: string;
+  avatarKey?: string | undefined;
+  frameKey?: string | undefined;
+  size?: "sm" | "md" | "lg" | "xl" | undefined;
+  dimmed?: boolean | undefined;
+  className?: string | undefined;
 }) {
   const sizes = {
     sm: "size-8 text-xs",
@@ -44,8 +44,8 @@ export function PlayerAvatar({
       aria-hidden
       className={cn(
         "grid shrink-0 place-items-center rounded-full bg-gradient-to-br font-semibold tracking-wide text-foreground/90",
-        PALETTES[avatarKey] ?? PALETTES.ash,
-        FRAMES[frameKey] ?? FRAMES.none,
+        PALETTES[avatarKey] ?? PALETTES['ash'],
+        FRAMES[frameKey] ?? FRAMES['none'],
         sizes[size],
         dimmed && "opacity-40 grayscale",
         className,

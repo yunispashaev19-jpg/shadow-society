@@ -91,7 +91,7 @@ export async function createRoom(input: {
   name: string;
   isPrivate: boolean;
   maxPlayers: number;
-  settings: Partial<GameSettings>;
+  settings: PartialSettings;
 }) {
   await leaveAllRooms(input.userId);
   const maxPlayers = Math.min(16, Math.max(MIN_PLAYERS, Math.round(input.maxPlayers)));
@@ -201,10 +201,10 @@ export async function setReady(input: { userId: string; roomId: string; ready: b
 export async function updateRoomSettings(input: {
   userId: string;
   roomId: string;
-  name?: string;
-  isPrivate?: boolean;
-  maxPlayers?: number;
-  settings?: Partial<GameSettings>;
+  name?: string | undefined;
+  isPrivate?: boolean | undefined;
+  maxPlayers?: number | undefined;
+  settings?: PartialSettings | undefined;
 }) {
   const { data: room } = await sb().from("rooms").select("*").eq("id", input.roomId).maybeSingle();
   if (!room) fail("Room not found.");
