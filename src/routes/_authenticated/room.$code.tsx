@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { leaveRoom, setReady, startGame, updateRoomSettings } from "@/lib/api.functions";
+import { joinRoom, leaveRoom, setReady, startGame, updateRoomSettings } from "@/lib/api.functions";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { MIN_PLAYERS, maxMafiaFor, normalizeSettings } from "@/lib/game/engine";
