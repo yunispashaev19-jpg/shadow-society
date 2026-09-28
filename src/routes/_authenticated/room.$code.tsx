@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Check, Copy, Crown, LogOut } from "lucide-react";
 
@@ -37,6 +37,7 @@ function RoomPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const doReady = useServerFn(setReady);
+  const doJoin = useServerFn(joinRoom);
   const doLeave = useServerFn(leaveRoom);
   const doStart = useServerFn(startGame);
   const doSettings = useServerFn(updateRoomSettings);
@@ -112,11 +113,11 @@ function RoomPage() {
     );
   }
 
-  if (!data) {
+  if (!data || joinError) {
     return (
       <AppShell>
         <div className="panel p-8 text-center">
-          <h1 className="font-display text-2xl">Room not found</h1>
+          <h1 className="font-display text-2xl">{joinError ?? "Room not found"}</h1>
           <Button className="mt-4" onClick={() => navigate({ to: "/rooms" })}>
             Browse rooms
           </Button>
