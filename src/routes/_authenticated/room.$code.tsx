@@ -79,12 +79,30 @@ function RoomPage() {
     };
   }, [roomId, code, queryClient]);
 
+  // Opening a shared room link seats you at the table (the server still
+  // enforces capacity, room status and privacy).
+  const seated = Boolean(
+    userId && (data?.room_players as PlayerRow[] | undefined)?.some((p) => p.user_id === userId),
+  );
+  const [joinError, setJoinError] = useState<string | null>(null);
+  const joining = useRef(false);
+  useEffect(() => {
+    if (!data || seated || joining.current || data.status !== "lobby" || joinError) return;
+    joining.current = true;
+    doJoin({ data: { code: code.toUpperCase() } })
+      .then(() => queryClient.invalidateQueries({ queryKey: ["room", code] }))
+      .catch((err: unknown) => setJoinError(err instanceof Error ? err.message : "Could not join this room."))
+      .finally(() => {
+        joining.current = false;
+      });
+  }, [data, seated, code, joinError, doJoin, queryClient]);
+
   // Reconnect / auto-follow: when the room enters a match, everyone joins it.
   useEffect(() => {
-    if (data?.status === "in_game" && data.current_game_id) {
+    if (data?.status === "in_game" && data.current_game_id && seated) {
       navigate({ to: "/game/$gameId", params: { gameId: data.current_game_id } });
     }
-  }, [data?.status, data?.current_game_id, navigate]);
+  }, [data?.status, data?.current_game_id, seated, navigate]);
 
   if (room.isLoading) {
     return (
