@@ -26,6 +26,9 @@ import {
 type Db = Database["public"]["Tables"];
 type GameRow = Db["games"]["Row"];
 
+/** Settings patch as it arrives from validated client input. */
+export type PartialSettings = { [K in keyof GameSettings]?: GameSettings[K] | undefined };
+
 export class GameError extends Error {}
 
 function fail(message: string): never {
