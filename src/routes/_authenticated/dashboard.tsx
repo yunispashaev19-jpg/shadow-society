@@ -68,6 +68,22 @@ function Dashboard() {
     },
   });
 
+  const active = useQuery({
+    queryKey: ["active-session", userId],
+    enabled: !!userId,
+    refetchInterval: 10000,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("room_players")
+        .select("rooms(code, status, current_game_id)")
+        .eq("user_id", userId!)
+        .maybeSingle();
+      const room = (data as { rooms: { code: string; status: string; current_game_id: string | null } | null } | null)
+        ?.rooms;
+      return room ?? null;
+    },
+  });
+
   async function run(fn: () => Promise<{ code: string }>) {
     setBusy(true);
     try {
@@ -83,6 +99,26 @@ function Dashboard() {
 
   return (
     <AppShell>
+      {active.data ? (
+        <section className="panel mb-6 flex flex-wrap items-center justify-between gap-4 p-5">
+          <div>
+            <p className="text-sm font-medium">
+              {active.data.status === "in_game" ? "You have a match in progress" : "You're seated at a table"}
+            </p>
+            <p className="text-sm text-muted-foreground">Room {active.data.code}</p>
+          </div>
+          <Button
+            onClick={() =>
+              active.data!.status === "in_game" && active.data!.current_game_id
+                ? navigate({ to: "/game/$gameId", params: { gameId: active.data!.current_game_id } })
+                : navigate({ to: "/room/$code", params: { code: active.data!.code } })
+            }
+          >
+            {active.data.status === "in_game" ? "Rejoin match" : "Back to room"}
+          </Button>
+        </section>
+      ) : null}
+
       <section className="panel overflow-hidden p-6 sm:p-8">
         <p className="text-sm text-muted-foreground">{t("dash.welcome")}</p>
         <h1 className="mt-1 font-display text-4xl">{profile?.username ?? "…"}</h1>
