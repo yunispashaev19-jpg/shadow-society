@@ -44,7 +44,7 @@ const DEFAULT_PREFS: Prefs = {
 
 function SettingsPage() {
   const { t, locale, setLocale } = useI18n();
-  const { email } = useAuth();
+  const { session } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
@@ -97,7 +97,7 @@ function SettingsPage() {
 
       <Section title={t("settings.account")}>
         <p className="text-sm text-muted-foreground">
-          Signed in as <span className="text-foreground">{email}</span>
+          Signed in as <span className="text-foreground">{session?.user.email}</span>
         </p>
         <form onSubmit={changePassword} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="flex-1 space-y-2">

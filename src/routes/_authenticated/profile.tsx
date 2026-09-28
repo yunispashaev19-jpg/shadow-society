@@ -116,14 +116,14 @@ function ProfilePage() {
           <div className="mt-4">
             <div className="flex justify-between text-xs text-muted-foreground">
               <span>
-                {progress.current} / {progress.needed} XP
+                {progress.into} / {progress.needed} XP
               </span>
               <span>
                 {t("profile.level")} {profile.level + 1}
               </span>
             </div>
             <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-surface-2">
-              <div className="accent-surface h-full rounded-full" style={{ width: `${progress.percent}%` }} />
+              <div className="accent-surface h-full rounded-full" style={{ width: `${Math.round((progress.into / Math.max(1, progress.needed)) * 100)}%` }} />
             </div>
           </div>
         </div>

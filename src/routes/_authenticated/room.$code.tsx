@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Check, Copy, Crown, LogOut } from "lucide-react";
 
@@ -12,7 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { leaveRoom, setReady, startGame, updateRoomSettings } from "@/lib/api.functions";
+import { joinRoom, leaveRoom, setReady, startGame, updateRoomSettings } from "@/lib/api.functions";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { MIN_PLAYERS, maxMafiaFor, normalizeSettings } from "@/lib/game/engine";
@@ -37,6 +37,7 @@ function RoomPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const doReady = useServerFn(setReady);
+  const doJoin = useServerFn(joinRoom);
   const doLeave = useServerFn(leaveRoom);
   const doStart = useServerFn(startGame);
   const doSettings = useServerFn(updateRoomSettings);
@@ -79,12 +80,30 @@ function RoomPage() {
     };
   }, [roomId, code, queryClient]);
 
+  // Opening a shared room link seats you at the table (the server still
+  // enforces capacity, room status and privacy).
+  const seated = Boolean(
+    userId && (data?.room_players as PlayerRow[] | undefined)?.some((p) => p.user_id === userId),
+  );
+  const [joinError, setJoinError] = useState<string | null>(null);
+  const joining = useRef(false);
+  useEffect(() => {
+    if (!data || seated || joining.current || data.status !== "lobby" || joinError) return;
+    joining.current = true;
+    doJoin({ data: { code: code.toUpperCase() } })
+      .then(() => queryClient.invalidateQueries({ queryKey: ["room", code] }))
+      .catch((err: unknown) => setJoinError(err instanceof Error ? err.message : "Could not join this room."))
+      .finally(() => {
+        joining.current = false;
+      });
+  }, [data, seated, code, joinError, doJoin, queryClient]);
+
   // Reconnect / auto-follow: when the room enters a match, everyone joins it.
   useEffect(() => {
-    if (data?.status === "in_game" && data.current_game_id) {
+    if (data?.status === "in_game" && data.current_game_id && seated) {
       navigate({ to: "/game/$gameId", params: { gameId: data.current_game_id } });
     }
-  }, [data?.status, data?.current_game_id, navigate]);
+  }, [data?.status, data?.current_game_id, seated, navigate]);
 
   if (room.isLoading) {
     return (
@@ -94,11 +113,11 @@ function RoomPage() {
     );
   }
 
-  if (!data) {
+  if (!data || joinError) {
     return (
       <AppShell>
         <div className="panel p-8 text-center">
-          <h1 className="font-display text-2xl">Room not found</h1>
+          <h1 className="font-display text-2xl">{joinError ?? "Room not found"}</h1>
           <Button className="mt-4" onClick={() => navigate({ to: "/rooms" })}>
             Browse rooms
           </Button>
