@@ -15,6 +15,13 @@
       "when": 1790874533966,
       "tag": "0001_tighten_read_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790874925465,
+      "tag": "0002_match_chat_analyses",
+      "breakpoints": true
     }
   ]
 }
