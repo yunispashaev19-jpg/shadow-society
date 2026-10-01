@@ -272,3 +272,17 @@ export const purchaseItem = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) =>
     (await core()).purchaseItem({ userId: context.userId, itemId: data.itemId }),
   );
+
+/** Public leaderboard: only non-sensitive ranking columns, top 100 by XP. */
+export const getLeaderboard = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async () => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data, error } = await supabaseAdmin
+      .from("profiles")
+      .select("id, username, avatar_key, frame_key, xp, level, wins, games_played")
+      .order("xp", { ascending: false })
+      .limit(100);
+    if (error) throw new Error("Could not load the leaderboard.");
+    return data ?? [];
+  });
