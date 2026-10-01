@@ -194,8 +194,8 @@ export const updateRoomSettings = createServerFn({ method: "POST" })
         .parse(d),
   )
   .handler(async ({ data, context }) => {
-    await (await core()).updateRoomSettings({ userId: context.userId, ...data });
-    return { ok: true };
+    const { code } = await (await core()).updateRoomSettings({ userId: context.userId, ...data });
+    return { ok: true, code };
   });
 
 export const startGame = createServerFn({ method: "POST" })

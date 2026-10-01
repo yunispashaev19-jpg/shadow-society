@@ -225,15 +225,20 @@ export async function updateRoomSettings(input: {
     { ...(room.settings as object), ...(input.settings ?? {}) },
     maxPlayers,
   );
+  const isPrivate = input.isPrivate ?? room.is_private;
+  // A room turning private gets a fresh long code so the old short one can't be guessed.
+  const code = isPrivate && room.code.length < 10 ? makeRoomCode(10) : room.code;
   await sb()
     .from("rooms")
     .update({
       name: input.name?.slice(0, 40) ?? room.name,
-      is_private: input.isPrivate ?? room.is_private,
+      is_private: isPrivate,
+      code,
       max_players: maxPlayers,
       settings: merged as never,
     })
     .eq("id", input.roomId);
+  return { code };
 }
 
 // ------------------------------------------------------------------- start
