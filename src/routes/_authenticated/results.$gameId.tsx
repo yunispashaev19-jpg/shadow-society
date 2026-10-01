@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Coins, Sparkles } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
+import { ChatAnalysisPanel } from "@/components/chat-analysis-panel";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -123,6 +124,8 @@ function Results() {
           );
         })}
       </section>
+
+      <ChatAnalysisPanel gameId={gameId} />
     </AppShell>
   );
 }
