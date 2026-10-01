@@ -5,7 +5,8 @@ import { useState } from "react";
 import { AppShell } from "@/components/app-shell";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { Input } from "@/components/ui/input";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { getLeaderboard } from "@/lib/api.functions";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
@@ -27,17 +28,11 @@ function LeaderboardPage() {
   const { userId } = useAuth();
   const [search, setSearch] = useState("");
 
+  const fetchBoard = useServerFn(getLeaderboard);
   const board = useQuery({
     queryKey: ["leaderboard"],
     refetchInterval: 30000,
-    queryFn: async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id, username, avatar_key, frame_key, xp, level, wins, games_played")
-        .order("xp", { ascending: false })
-        .limit(100);
-      return data ?? [];
-    },
+    queryFn: () => fetchBoard(),
   });
 
   const rows = (board.data ?? []).filter((p) =>

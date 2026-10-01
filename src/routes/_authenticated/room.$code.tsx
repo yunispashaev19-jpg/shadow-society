@@ -88,7 +88,9 @@ function RoomPage() {
   const [joinError, setJoinError] = useState<string | null>(null);
   const joining = useRef(false);
   useEffect(() => {
-    if (!data || seated || joining.current || data.status !== "lobby" || joinError) return;
+    // Private rooms stay hidden until you're seated, so a missing row means "try to join".
+    if (room.isLoading || seated || joining.current || joinError) return;
+    if (data && data.status !== "lobby") return;
     joining.current = true;
     doJoin({ data: { code: code.toUpperCase() } })
       .then(() => queryClient.invalidateQueries({ queryKey: ["room", code] }))
@@ -96,7 +98,7 @@ function RoomPage() {
       .finally(() => {
         joining.current = false;
       });
-  }, [data, seated, code, joinError, doJoin, queryClient]);
+  }, [data, room.isLoading, seated, code, joinError, doJoin, queryClient]);
 
   // Reconnect / auto-follow: when the room enters a match, everyone joins it.
   useEffect(() => {

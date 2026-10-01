@@ -706,6 +706,8 @@ export type Database = {
         Returns: boolean
       }
       is_game_participant: { Args: { _game_id: string }; Returns: boolean }
+      is_room_member: { Args: { _room_id: string }; Returns: boolean }
+      shares_table_with: { Args: { _other: string }; Returns: boolean }
     }
     Enums: {
       chat_channel: "lobby" | "day" | "mafia" | "dead"
