@@ -311,6 +311,45 @@ export type Database = {
           },
         ]
       }
+      match_chat_analyses: {
+        Row: {
+          analysis: Json
+          created_at: string
+          game_id: string
+          message_count: number
+          requested_by: string
+        }
+        Insert: {
+          analysis: Json
+          created_at?: string
+          game_id: string
+          message_count?: number
+          requested_by: string
+        }
+        Update: {
+          analysis?: Json
+          created_at?: string
+          game_id?: string
+          message_count?: number
+          requested_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_chat_analyses_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: true
+            referencedRelation: "games"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_chat_analyses_requested_by_fkey"
+            columns: ["requested_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_results: {
         Row: {
           coins_earned: number

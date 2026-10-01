@@ -286,3 +286,85 @@ export const getLeaderboard = createServerFn({ method: "POST" })
     if (error) throw new Error("Could not load the leaderboard.");
     return data ?? [];
   });
+
+/**
+ * Submits a finished match's public table chat for an AI summary of key claims
+ * and contradictions. The server loads the log itself (clients can't forge it),
+ * only participants may ask, and the result is cached per match.
+ */
+export const analyzeMatchChat = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { gameId: string }) => z.object({ gameId: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { analyzeTranscript, AiGatewayError } = await import("./ai/chat-analysis.server");
+
+    const { data: me } = await supabaseAdmin
+      .from("game_players")
+      .select("user_id")
+      .eq("game_id", data.gameId)
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (!me) throw new Error("Only players from this match can analyse its chat.");
+
+    const { data: game } = await supabaseAdmin
+      .from("games")
+      .select("id, phase, winner")
+      .eq("id", data.gameId)
+      .maybeSingle();
+    if (!game || game.phase !== "ended") throw new Error("Chat can only be analysed after the match ends.");
+
+    const { data: cached } = await supabaseAdmin
+      .from("match_chat_analyses")
+      .select("*")
+      .eq("game_id", data.gameId)
+      .maybeSingle();
+    if (cached) return cached;
+
+    const [{ data: messages }, { data: results }] = await Promise.all([
+      supabaseAdmin
+        .from("chat_messages")
+        .select("content, created_at, profiles(username)")
+        .eq("game_id", data.gameId)
+        .eq("channel", "day")
+        .order("created_at", { ascending: true })
+        .limit(600),
+      supabaseAdmin
+        .from("match_results")
+        .select("role, survived, profiles(username)")
+        .eq("game_id", data.gameId),
+    ]);
+    const lines = (messages ?? []).map((m) => ({
+      round: null,
+      player: (m.profiles as { username: string } | null)?.username ?? "unknown",
+      content: m.content,
+    }));
+    if (lines.length < 3) throw new Error("There isn't enough table talk in this match to analyse.");
+
+    let analysis;
+    try {
+      analysis = await analyzeTranscript({
+        lines,
+        winner: game.winner,
+        roster: (results ?? []).map((r) => ({
+          player: (r.profiles as { username: string } | null)?.username ?? "unknown",
+          role: r.role,
+          survived: r.survived,
+        })),
+      });
+    } catch (err) {
+      if (err instanceof AiGatewayError) throw new Error(err.message);
+      throw err;
+    }
+
+    const { data: saved, error } = await supabaseAdmin
+      .from("match_chat_analyses")
+      .upsert(
+        { game_id: data.gameId, requested_by: context.userId, message_count: lines.length, analysis },
+        { onConflict: "game_id", ignoreDuplicates: false },
+      )
+      .select("*")
+      .single();
+    if (error) throw new Error("Could not save the analysis.");
+    return saved;
+  });
