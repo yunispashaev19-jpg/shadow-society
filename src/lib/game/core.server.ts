@@ -41,10 +41,16 @@ function inSeconds(seconds: number): string {
   return new Date(Date.now() + seconds * 1000).toISOString();
 }
 
-export function makeRoomCode(): string {
+/**
+ * Room codes come from a cryptographically secure RNG. The 32-symbol alphabet
+ * maps evenly onto 5 random bits (no modulo bias). Private rooms get 10
+ * characters (~50 bits) so they cannot be found by guessing.
+ */
+export function makeRoomCode(length = 6): string {
   const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  const bytes = crypto.getRandomValues(new Uint8Array(length));
   let out = "";
-  for (let i = 0; i < 6; i++) out += alphabet[Math.floor(Math.random() * alphabet.length)];
+  for (const b of bytes) out += alphabet[b & 31];
   return out;
 }
 
@@ -100,7 +106,7 @@ export async function createRoom(input: {
   const maxPlayers = Math.min(16, Math.max(MIN_PLAYERS, Math.round(input.maxPlayers)));
   const settings = normalizeSettings(input.settings, maxPlayers);
   for (let attempt = 0; attempt < 6; attempt++) {
-    const code = makeRoomCode();
+    const code = makeRoomCode(input.isPrivate ? 10 : 6);
     const { data, error } = await sb()
       .from("rooms")
       .insert({
@@ -219,15 +225,20 @@ export async function updateRoomSettings(input: {
     { ...(room.settings as object), ...(input.settings ?? {}) },
     maxPlayers,
   );
+  const isPrivate = input.isPrivate ?? room.is_private;
+  // A room turning private gets a fresh long code so the old short one can't be guessed.
+  const code = isPrivate && room.code.length < 10 ? makeRoomCode(10) : room.code;
   await sb()
     .from("rooms")
     .update({
       name: input.name?.slice(0, 40) ?? room.name,
-      is_private: input.isPrivate ?? room.is_private,
+      is_private: isPrivate,
+      code,
       max_players: maxPlayers,
       settings: merged as never,
     })
     .eq("id", input.roomId);
+  return { code };
 }
 
 // ------------------------------------------------------------------- start

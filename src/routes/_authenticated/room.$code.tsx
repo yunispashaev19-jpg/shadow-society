@@ -66,9 +66,15 @@ function RoomPage() {
     if (!roomId) return;
     const channel = supabase
       .channel(`room-${roomId}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "rooms", filter: `id=eq.${roomId}` }, () =>
-        queryClient.invalidateQueries({ queryKey: ["room", code] }),
-      )
+      .on("postgres_changes", { event: "*", schema: "public", table: "rooms", filter: `id=eq.${roomId}` }, (payload) => {
+        // Turning a room private issues a new code — follow it so nobody gets stranded.
+        const next = (payload.new as { code?: string } | null)?.code;
+        if (next && next !== code.toUpperCase()) {
+          navigate({ to: "/room/$code", params: { code: next }, replace: true });
+          return;
+        }
+        queryClient.invalidateQueries({ queryKey: ["room", code] });
+      })
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "room_players", filter: `room_id=eq.${roomId}` },
@@ -78,7 +84,7 @@ function RoomPage() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [roomId, code, queryClient]);
+  }, [roomId, code, queryClient, navigate]);
 
   // Opening a shared room link seats you at the table (the server still
   // enforces capacity, room status and privacy).
@@ -305,7 +311,14 @@ function RoomPage() {
                 label="Private room"
                 checked={data.is_private}
                 disabled={!isHost || busy}
-                onChange={(v) => guard(() => doSettings({ data: { roomId: data.id, isPrivate: v } }))}
+                onChange={(v) =>
+                  guard(async () => {
+                    const res = await doSettings({ data: { roomId: data.id, isPrivate: v } });
+                    if (res.code !== data.code) {
+                      navigate({ to: "/room/$code", params: { code: res.code }, replace: true });
+                    }
+                  })
+                }
               />
             </div>
           </div>
