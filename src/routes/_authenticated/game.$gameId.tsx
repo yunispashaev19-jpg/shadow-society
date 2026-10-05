@@ -7,6 +7,7 @@ import { Eye, HeartPulse, Moon, Skull, Sun, Users, Vote } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { ChatPanel } from "@/components/chat-panel";
+import { VoiceChat } from "@/components/voice-chat";
 import { PlayerAvatar } from "@/components/player-avatar";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -294,13 +295,29 @@ function GamePage() {
           </section>
         </div>
 
-        <ChatPanel
-          roomId={s.game.roomId}
-          gameId={gameId}
-          disabled={phase === "night" && myRole !== "mafia" && s.me.alive}
-          disabledHint="The town is asleep"
-          className="h-[60vh] lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]"
-        />
+        <div className="flex flex-col gap-4 lg:sticky lg:top-24">
+          {userId && phase !== "ended" && (
+            <VoiceChat
+              gameId={gameId}
+              userId={userId}
+              peerIds={s.players.map((p) => p.userId)}
+              canSpeak={s.me.alive && (phase !== "night" || myRole === "mafia")}
+              listeners={
+                phase === "night"
+                  ? s.players.filter((p) => p.role === "mafia" && p.userId !== userId).map((p) => p.userId)
+                  : null
+              }
+              statusHint={s.me.alive ? "The town is asleep" : "Eliminated players can listen only"}
+            />
+          )}
+          <ChatPanel
+            roomId={s.game.roomId}
+            gameId={gameId}
+            disabled={phase === "night" && myRole !== "mafia" && s.me.alive}
+            disabledHint="The town is asleep"
+            className="h-[60vh] lg:h-[calc(100vh-16rem)]"
+          />
+        </div>
       </div>
     </AppShell>
   );
