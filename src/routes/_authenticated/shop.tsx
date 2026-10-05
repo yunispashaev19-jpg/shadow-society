@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Coins } from "lucide-react";
 
@@ -13,6 +13,61 @@ import { purchaseItem, updateProfile } from "@/lib/api.functions";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { COIN_PACKS, ENTRY_FEE_COINS } from "@/lib/economy";
+import { confirmCoinPurchase, createCoinCheckout } from "@/lib/payments.functions";
+
+function CoinPacks({ onCredited }: { onCredited: () => Promise<unknown> }) {
+  const checkout = useServerFn(createCoinCheckout);
+  const confirm = useServerFn(confirmCoinPurchase);
+  const [busy, setBusy] = useState<string | null>(null);
+  const confirmed = useRef(false);
+
+  useEffect(() => {
+    const sessionId = new URLSearchParams(window.location.search).get("session_id");
+    if (!sessionId || confirmed.current) return;
+    confirmed.current = true;
+    confirm({ data: { sessionId } })
+      .then(async (r) => {
+        if (r.status === "pending") toast.message("Payment is still processing. Refresh in a moment.");
+        else {
+          if (r.status === "credited") toast.success(`${r.coins.toLocaleString("en-US")} coins added.`);
+          await onCredited();
+        }
+        window.history.replaceState(null, "", "/shop");
+      })
+      .catch((e) => toast.error(e instanceof Error ? e.message : "Could not confirm payment."));
+  }, [confirm, onCredited]);
+
+  async function buy(packId: string) {
+    setBusy(packId);
+    try {
+      const { url } = await checkout({ data: { packId } });
+      window.location.href = url;
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start checkout.");
+      setBusy(null);
+    }
+  }
+
+  return (
+    <section className="mt-10">
+      <h2 className="font-display text-2xl">Buy coins</h2>
+      <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        {COIN_PACKS.map((p) => (
+          <div key={p.id} className="panel flex items-center justify-between gap-3 p-4">
+            <span className="flex items-center gap-2 font-semibold tabular-nums">
+              <Coins className="size-4 text-warning" aria-hidden />
+              {p.coins.toLocaleString("en-US")}
+            </span>
+            <Button size="sm" disabled={busy !== null} onClick={() => buy(p.id)}>
+              ${(p.cents / 100).toFixed(2)}
+            </Button>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
 
 export const Route = createFileRoute("/_authenticated/shop")({
   head: () => ({
@@ -158,9 +213,11 @@ function ShopPage() {
         })}
       </div>
 
+      <CoinPacks onCredited={refreshProfile} />
+
       <p className="mt-8 text-xs text-muted-foreground">
-        Coins are earned by playing. Paid currency purchases are not enabled yet — when they are, every
-        transaction will be validated on the server before any balance changes.
+        Each match costs {ENTRY_FEE_COINS} coins. Coins buy cosmetics and match entries only — never
+        gameplay advantages. Payments are confirmed with the payment provider on the server before coins are added.
       </p>
     </AppShell>
   );
