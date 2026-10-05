@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Coins } from "lucide-react";
 
@@ -15,7 +15,6 @@ import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { COIN_PACKS, ENTRY_FEE_COINS } from "@/lib/economy";
 import { confirmCoinPurchase, createCoinCheckout } from "@/lib/payments.functions";
-import { useEffect, useRef } from "react";
 
 function CoinPacks({ onCredited }: { onCredited: () => Promise<unknown> }) {
   const checkout = useServerFn(createCoinCheckout);
