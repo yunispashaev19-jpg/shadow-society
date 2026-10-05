@@ -22,6 +22,13 @@
       "when": 1790874925465,
       "tag": "0002_match_chat_analyses",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791191177866,
+      "tag": "0003_entry_fee_charge",
+      "breakpoints": true
     }
   ]
 }
