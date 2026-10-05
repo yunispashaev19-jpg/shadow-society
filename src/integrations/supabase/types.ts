@@ -744,6 +744,10 @@ export type Database = {
         }
         Returns: boolean
       }
+      charge_entry_fees: {
+        Args: { _fee: number; _game_id: string; _user_ids: string[] }
+        Returns: undefined
+      }
       is_game_participant: { Args: { _game_id: string }; Returns: boolean }
       is_room_member: { Args: { _room_id: string }; Returns: boolean }
       shares_table_with: { Args: { _other: string }; Returns: boolean }

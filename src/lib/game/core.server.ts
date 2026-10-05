@@ -243,6 +243,9 @@ export async function updateRoomSettings(input: {
 
 // ------------------------------------------------------------------- start
 
+/** Coins each player pays to enter a match. */
+export const ENTRY_FEE = 100;
+
 export async function startGame(input: { userId: string; roomId: string }) {
   const { data: room } = await sb().from("rooms").select("*").eq("id", input.roomId).maybeSingle();
   if (!room) fail("Room not found.");
@@ -298,6 +301,20 @@ export async function startGame(input: { userId: string; roomId: string }) {
     await sb().from("games").delete().eq("id", game.id);
     const { data: fresh } = await sb().from("rooms").select("current_game_id").eq("id", room.id).single();
     return { gameId: fresh?.current_game_id ?? null };
+  }
+
+  // Charge the entry fee atomically for everyone; roll back the match if anyone can't pay.
+  const { error: feeError } = await sb().rpc("charge_entry_fees", {
+    _game_id: game.id,
+    _user_ids: roster.map((p) => p.user_id),
+    _fee: ENTRY_FEE,
+  });
+  if (feeError) {
+    await sb().from("rooms").update({ status: "lobby", current_game_id: null }).eq("id", room.id);
+    await sb().from("game_roles").delete().eq("game_id", game.id);
+    await sb().from("game_players").delete().eq("game_id", game.id);
+    await sb().from("games").delete().eq("id", game.id);
+    fail(`Every player needs at least ${ENTRY_FEE} coins to play.`);
   }
 
   await logEvent(game.id, 1, "night", "phase", "Night falls. The town sleeps.");
