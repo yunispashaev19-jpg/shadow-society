@@ -29,6 +29,13 @@
       "when": 1791191177866,
       "tag": "0003_entry_fee_charge",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791194852600,
+      "tag": "0004_coin_purchases",
+      "breakpoints": true
     }
   ]
 }

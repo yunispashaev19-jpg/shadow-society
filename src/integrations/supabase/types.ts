@@ -87,6 +87,41 @@ export type Database = {
           },
         ]
       }
+      coin_purchases: {
+        Row: {
+          amount_cents: number
+          coins: number
+          created_at: string
+          pack_id: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_cents: number
+          coins: number
+          created_at?: string
+          pack_id: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          amount_cents?: number
+          coins?: number
+          created_at?: string
+          pack_id?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coin_purchases_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_actions: {
         Row: {
           actor_id: string
@@ -747,6 +782,16 @@ export type Database = {
       charge_entry_fees: {
         Args: { _fee: number; _game_id: string; _user_ids: string[] }
         Returns: undefined
+      }
+      credit_coin_purchase: {
+        Args: {
+          _amount_cents: number
+          _coins: number
+          _pack_id: string
+          _session_id: string
+          _user_id: string
+        }
+        Returns: boolean
       }
       is_game_participant: { Args: { _game_id: string }; Returns: boolean }
       is_room_member: { Args: { _room_id: string }; Returns: boolean }
