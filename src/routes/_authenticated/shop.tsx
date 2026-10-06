@@ -213,7 +213,7 @@ function ShopPage() {
         })}
       </div>
 
-      <CoinPacks onCredited={refreshProfile} />
+      <CoinPacks onCredited={async () => refreshProfile()} />
 
       <p className="mt-8 text-xs text-muted-foreground">
         Each match costs {ENTRY_FEE_COINS} coins. Coins buy cosmetics and match entries only — never
