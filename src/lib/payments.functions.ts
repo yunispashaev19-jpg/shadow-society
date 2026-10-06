@@ -22,7 +22,7 @@ async function stripe(path: string, init?: { method?: string; body?: URLSearchPa
   });
   const json = (await res.json()) as Record<string, unknown>;
   if (!res.ok) {
-    const msg = (json.error as { message?: string } | undefined)?.message;
+    const msg = (json["error"] as { message?: string } | undefined)?.message;
     console.error("Stripe error", res.status, msg);
     throw new Error("The payment service could not process this right now.");
   }
@@ -51,7 +51,7 @@ export const createCoinCheckout = createServerFn({ method: "POST" })
       "line_items[0][price_data][product_data][name]": `${pack.coins.toLocaleString("en-US")} coins`,
     });
     const session = await stripe("checkout/sessions", { method: "POST", body });
-    return { url: session.url as string };
+    return { url: session["url"] as string };
   });
 
 export const confirmCoinPurchase = createServerFn({ method: "POST" })
@@ -61,11 +61,11 @@ export const confirmCoinPurchase = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const session = await stripe(`checkout/sessions/${encodeURIComponent(data.sessionId)}`);
-    const meta = (session.metadata ?? {}) as Record<string, string>;
-    if (meta.user_id !== context.userId) throw new Error("This purchase belongs to another account.");
-    if (session.payment_status !== "paid") return { status: "pending" as const, coins: 0 };
-    const pack = findPack(meta.pack_id ?? "");
-    if (!pack || session.amount_total !== pack.cents) throw new Error("Purchase details did not match.");
+    const meta = (session["metadata"] ?? {}) as Record<string, string>;
+    if (meta["user_id"] !== context.userId) throw new Error("This purchase belongs to another account.");
+    if (session["payment_status"] !== "paid") return { status: "pending" as const, coins: 0 };
+    const pack = findPack(meta["pack_id"] ?? "");
+    if (!pack || session["amount_total"] !== pack.cents) throw new Error("Purchase details did not match.");
 
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: credited, error } = await supabaseAdmin.rpc("credit_coin_purchase", {
