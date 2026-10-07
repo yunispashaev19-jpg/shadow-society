@@ -8,3 +8,5 @@
 > Commits you push to the connected branch sync back to Lovable and show up in
 > the editor, so keep the branch in a working state.
 <!-- LOVABLE:END -->
+
+- Native store apps use Capacitor as a remote shell loading the published URL (capacitor.config.ts); why: the app is server-rendered, so a static bundle can't run it.
