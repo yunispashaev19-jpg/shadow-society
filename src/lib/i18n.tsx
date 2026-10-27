@@ -46,6 +46,8 @@ const en = {
   "auth.password": "Password",
   "auth.username": "Username",
   "auth.google": "Continue with Google",
+  "auth.apple": "Continue with Apple",
+  "auth.providerError": "{provider} sign-in is unavailable right now. Please try again.",
   "auth.forgot": "Forgot password?",
   "auth.haveAccount": "Already have an account?",
   "auth.noAccount": "No account yet?",

@@ -27,6 +27,8 @@ import { levelProgress } from "@/lib/game/engine";
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Play — Mafia" },
       { name: "description", content: "Jump into a table, create a room or join with a code." },
       { property: "og:title", content: "Play — Mafia" },
@@ -214,7 +216,7 @@ function Dashboard() {
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="ABC123"
-              maxLength={8}
+              maxLength={10}
               aria-label={t("dash.joinCode")}
               className="uppercase tracking-widest"
             />

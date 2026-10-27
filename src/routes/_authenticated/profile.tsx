@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/profile")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Your profile — Mafia" },
       { name: "description", content: "Your Mafia level, win rate, match history and achievements." },
       { property: "og:title", content: "Your profile — Mafia" },

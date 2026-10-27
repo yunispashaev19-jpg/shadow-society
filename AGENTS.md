@@ -10,3 +10,4 @@
 <!-- LOVABLE:END -->
 
 - Native store apps use Capacitor as a remote shell loading the published URL (capacitor.config.ts); why: the app is server-rendered, so a static bundle can't run it.
+- Managed social sign-in uses the generated Lovable helper with a public same-origin return URL; AuthProvider confirms the session before navigating to protected pages.

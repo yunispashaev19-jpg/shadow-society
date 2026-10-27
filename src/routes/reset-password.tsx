@@ -12,6 +12,8 @@ export const Route = createFileRoute("/reset-password")({
   ssr: false,
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Set a new password — Mafia" },
       { name: "description", content: "Choose a new password for your Mafia account." },
       { property: "og:title", content: "Set a new password — Mafia" },

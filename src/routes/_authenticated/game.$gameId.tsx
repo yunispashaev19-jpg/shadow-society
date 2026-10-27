@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/game/$gameId")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Live match — Mafia" },
       { name: "description", content: "An active Mafia match: night actions, discussion and voting." },
       { property: "og:title", content: "Live match — Mafia" },

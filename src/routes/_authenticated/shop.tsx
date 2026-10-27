@@ -72,6 +72,8 @@ function CoinPacks({ onCredited }: { onCredited: () => Promise<unknown> }) {
 export const Route = createFileRoute("/_authenticated/shop")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Shop — Mafia" },
       { name: "description", content: "Avatars, frames and emotes. Cosmetics only, never advantages." },
       { property: "og:title", content: "Shop — Mafia" },

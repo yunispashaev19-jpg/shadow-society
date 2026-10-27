@@ -15,6 +15,8 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/results/$gameId")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Match results — Mafia" },
       { name: "description", content: "Who won, who lied, and what everyone earned." },
       { property: "og:title", content: "Match results — Mafia" },
@@ -34,13 +36,15 @@ function Results() {
   const summary = useQuery({
     queryKey: ["results", gameId],
     queryFn: async () => {
-      const [{ data: game }, { data: results }] = await Promise.all([
-        supabase.from("games").select("id, winner, round, room_id, rooms(code)").eq("id", gameId).maybeSingle(),
+      const [{ data: game, error: gameError }, { data: results, error: resultsError }] = await Promise.all([
+        supabase.from("games").select("id, winner, round, room_id, rooms!games_room_id_fkey(code)").eq("id", gameId).maybeSingle(),
         supabase
           .from("match_results")
           .select("user_id, role, won, xp_earned, coins_earned, survived, profiles(username, avatar_key, frame_key)")
           .eq("game_id", gameId),
       ]);
+      if (gameError) throw gameError;
+      if (resultsError) throw resultsError;
       refreshProfile();
       return { game, results: results ?? [] };
     },
@@ -50,6 +54,11 @@ function Results() {
   const results = summary.data?.results ?? [];
   const mine = results.find((r) => r.user_id === userId);
   const winner = game?.winner as "mafia" | "town" | null | undefined;
+
+  if (summary.isPending) return <AppShell><p>{t("common.loading")}</p></AppShell>;
+  if (summary.isError || !game || !winner) {
+    return <AppShell><p role="alert">{t("common.error")}</p></AppShell>;
+  }
 
   return (
     <AppShell>

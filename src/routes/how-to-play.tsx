@@ -4,6 +4,8 @@ import { BrandMark } from "@/components/brand";
 export const Route = createFileRoute("/how-to-play")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "How to play Mafia — Rules and roles" },
       {
         name: "description",
