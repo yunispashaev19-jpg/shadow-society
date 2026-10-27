@@ -18,6 +18,8 @@ export const Route = createFileRoute("/auth")({
       { name: "description", content: "Sign in or create an account to play Mafia online." },
       { property: "og:title", content: "Sign in — Mafia" },
       { property: "og:description", content: "Sign in or create an account to play Mafia online." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "robots", content: "noindex" },
     ],
   }),
@@ -45,9 +47,10 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "forgot") {
-        await supabase.auth.resetPasswordForEmail(email, {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
+        if (error) throw error;
         toast.success(t("auth.resetSent"));
         setMode("signin");
         return;
@@ -77,16 +80,20 @@ function AuthPage() {
     }
   }
 
-  async function onGoogle() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
-    });
-    if (result.error) {
-      toast.error("Google sign-in is unavailable right now.");
-      return;
+  async function onSocial(provider: "google" | "apple") {
+    setBusy(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth(provider, {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (result.redirected) return;
+      // AuthProvider navigates only once a confirmed session is available.
+    } catch {
+      toast.error(t("auth.providerError", { provider: provider === "apple" ? "Apple" : "Google" }));
+    } finally {
+      setBusy(false);
     }
-    if (result.redirected) return;
-    navigate({ to: "/dashboard" });
   }
 
   return (
@@ -162,8 +169,11 @@ function AuthPage() {
                 or
                 <span className="h-px flex-1 bg-border" />
               </div>
-              <Button type="button" variant="outline" className="w-full" onClick={onGoogle}>
+              <Button type="button" variant="outline" className="w-full" disabled={busy} onClick={() => onSocial("google")}>
                 {t("auth.google")}
+              </Button>
+              <Button type="button" variant="outline" className="mt-3 w-full" disabled={busy} onClick={() => onSocial("apple")}>
+                {t("auth.apple")}
               </Button>
             </>
           )}
