@@ -15,6 +15,8 @@ import { useI18n } from "@/lib/i18n";
 export const Route = createFileRoute("/_authenticated/rooms")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Public rooms — Mafia" },
       { name: "description", content: "Browse open public Mafia tables and join a match." },
       { property: "og:title", content: "Public rooms — Mafia" },

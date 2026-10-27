@@ -15,6 +15,8 @@ import { LOCALES, PLANNED_LOCALES, useI18n } from "@/lib/i18n";
 export const Route = createFileRoute("/_authenticated/settings")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Settings — Mafia" },
       { name: "description", content: "Account, audio, notification, accessibility and privacy settings." },
       { property: "og:title", content: "Settings — Mafia" },

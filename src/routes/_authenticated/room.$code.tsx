@@ -20,6 +20,8 @@ import { MIN_PLAYERS, maxMafiaFor, normalizeSettings } from "@/lib/game/engine";
 export const Route = createFileRoute("/_authenticated/room/$code")({
   head: () => ({
     meta: [
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       { title: "Room — Mafia" },
       { name: "description", content: "Your Mafia table: players, settings and the start button." },
       { property: "og:title", content: "Room — Mafia" },
