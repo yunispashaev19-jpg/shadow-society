@@ -1,7 +1,10 @@
 # Roadmap
 
 - [x] Add managed Apple sign-in alongside Google and email
-- [ ] Verify sign-in, room actions, match flow, chat and voice controls
+- [x] Verify password sign-in/sign-out, private code join, readiness, full match, chat, saved rewards and AI analysis
+- [x] Verify voice join/connection/leave with browser test microphones
+- [ ] Complete Apple and Google sign-in with real provider accounts; blocker: requires account-owner approval
+- [ ] Verify voice with real microphones on separate devices; blocker: requires two people/devices
 
 - [x] Entry fee: 100 coins per match, charged on the server when the match starts
 - [x] Coin packs for real money via Stripe (own account)
