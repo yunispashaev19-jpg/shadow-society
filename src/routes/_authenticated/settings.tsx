@@ -122,10 +122,6 @@ function SettingsPage() {
       <Section title={t("settings.audio")}>
         <Row id="sound" label="Sound effects" checked={prefs.sound} onChange={(v) => update({ sound: v })} />
         <Row id="music" label="Ambient music" checked={prefs.music} onChange={(v) => update({ music: v })} />
-        <p className="mt-3 text-xs text-muted-foreground">
-          Voice chat is not enabled yet. The game is built to plug into a real WebRTC provider; until one is
-          connected there is no voice audio, simulated or otherwise.
-        </p>
       </Section>
 
       <Section title={t("settings.notifications")}>

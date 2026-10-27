@@ -214,7 +214,7 @@ function Dashboard() {
               value={code}
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="ABC123"
-              maxLength={8}
+              maxLength={10}
               aria-label={t("dash.joinCode")}
               className="uppercase tracking-widest"
             />
