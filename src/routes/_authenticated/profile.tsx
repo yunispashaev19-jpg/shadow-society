@@ -1,17 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
-import { toast } from "sonner";
 import { Award } from "lucide-react";
 
 import { AppShell } from "@/components/app-shell";
 import { PlayerAvatar } from "@/components/player-avatar";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { NicknameForm } from "@/components/nickname-form";
 import { supabase } from "@/integrations/supabase/client";
-import { updateProfile } from "@/lib/api.functions";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { levelProgress, ROLE_META, type Role } from "@/lib/game/engine";
@@ -33,19 +27,17 @@ export const Route = createFileRoute("/_authenticated/profile")({
 
 function ProfilePage() {
   const { t } = useI18n();
-  const { userId, profile, refreshProfile } = useAuth();
-  const save = useServerFn(updateProfile);
-  const [username, setUsername] = useState("");
-  const [busy, setBusy] = useState(false);
+  const { userId, profile } = useAuth();
 
   const history = useQuery({
     queryKey: ["match-history", userId],
     enabled: Boolean(userId),
     queryFn: async () => {
+      if (!userId) return [];
       const { data } = await supabase
         .from("match_results")
         .select("game_id, role, won, xp_earned, coins_earned, survived, created_at")
-        .eq("user_id", userId!)
+        .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(15);
       return data ?? [];
@@ -56,9 +48,10 @@ function ProfilePage() {
     queryKey: ["achievements", userId],
     enabled: Boolean(userId),
     queryFn: async () => {
+      if (!userId) return [];
       const [{ data: all }, { data: mine }] = await Promise.all([
         supabase.from("achievements").select("id, name, description, icon"),
-        supabase.from("user_achievements").select("achievement_id").eq("user_id", userId!),
+        supabase.from("user_achievements").select("achievement_id").eq("user_id", userId),
       ]);
       const unlocked = new Set((mine ?? []).map((m) => m.achievement_id));
       return (all ?? []).map((a) => ({ ...a, unlocked: unlocked.has(a.id) }));
@@ -83,23 +76,6 @@ function ProfilePage() {
   ];
   const favourite = roleCounts.reduce((a, b) => (b[1] > a[1] ? b : a));
 
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const next = username.trim();
-    if (!next || next === profile?.username) return;
-    setBusy(true);
-    try {
-      await save({ data: { username: next } });
-      await refreshProfile();
-      setUsername("");
-      toast.success("Profile updated.");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("common.error"));
-    } finally {
-      setBusy(false);
-    }
-  }
-
   return (
     <AppShell>
       <section className="panel flex flex-col items-center gap-5 p-6 sm:flex-row sm:items-start">
@@ -110,7 +86,8 @@ function ProfilePage() {
           size="xl"
         />
         <div className="w-full text-center sm:text-left">
-          <h1 className="font-display text-4xl">{profile.username}</h1>
+          <h1 className="break-all font-display text-4xl">{profile.username}</h1>
+          <p className="mt-2 break-all font-mono text-xs text-muted-foreground">{t("identity.id")}: {profile.id}</p>
           <p className="mt-1 text-sm text-muted-foreground">
             {t("profile.level")} {profile.level} · joined{" "}
             {new Date(profile.created_at).toLocaleDateString()}
@@ -182,22 +159,8 @@ function ProfilePage() {
       </section>
 
       <section className="mt-6 panel p-5">
-        <h2 className="text-lg font-semibold">Change username</h2>
-        <form onSubmit={submit} className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1 space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder={profile.username}
-              maxLength={18}
-            />
-          </div>
-          <Button type="submit" disabled={busy}>
-            {t("profile.save")}
-          </Button>
-        </form>
+        <h2 className="mb-3 text-lg font-semibold">{t("identity.change")}</h2>
+        <NicknameForm />
       </section>
     </AppShell>
   );
