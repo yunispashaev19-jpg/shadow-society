@@ -1,5 +1,10 @@
 # Roadmap
 
+- [ ] Unique case-insensitive nicknames and stable player IDs
+- [ ] First nickname change free; subsequent changes cost 25,000 coins atomically
+- [ ] Player search, friend requests, accept/reject and remove friends
+- [ ] Verify identity, rename charges and friend actions end to end
+
 - [x] Add managed Apple sign-in alongside Google and email
 - [x] Verify password sign-in/sign-out, private code join, readiness, full match, chat, saved rewards and AI analysis
 - [x] Verify voice join/connection/leave with browser test microphones
