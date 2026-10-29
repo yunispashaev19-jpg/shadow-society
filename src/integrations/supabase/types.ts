@@ -122,6 +122,45 @@ export type Database = {
           },
         ]
       }
+      friendships: {
+        Row: {
+          created_at: string
+          id: string
+          recipient_id: string
+          requester_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          recipient_id: string
+          requester_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          recipient_id?: string
+          requester_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "friendships_recipient_id_fkey"
+            columns: ["recipient_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "friendships_requester_id_fkey"
+            columns: ["requester_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game_actions: {
         Row: {
           actor_id: string
@@ -449,6 +488,7 @@ export type Database = {
           id: string
           level: number
           mafia_games: number
+          nickname_changes: number
           updated_at: string
           username: string
           wins: number
@@ -466,6 +506,7 @@ export type Database = {
           id: string
           level?: number
           mafia_games?: number
+          nickname_changes?: number
           updated_at?: string
           username: string
           wins?: number
@@ -483,6 +524,7 @@ export type Database = {
           id?: string
           level?: number
           mafia_games?: number
+          nickname_changes?: number
           updated_at?: string
           username?: string
           wins?: number
@@ -779,6 +821,33 @@ export type Database = {
         }
         Returns: boolean
       }
+      change_nickname: {
+        Args: { _nickname: string }
+        Returns: {
+          avatar_key: string
+          civilian_games: number
+          coins: number
+          created_at: string
+          detective_games: number
+          doctor_games: number
+          frame_key: string
+          games_played: number
+          id: string
+          level: number
+          mafia_games: number
+          nickname_changes: number
+          updated_at: string
+          username: string
+          wins: number
+          xp: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       charge_entry_fees: {
         Args: { _fee: number; _game_id: string; _user_ids: string[] }
         Returns: undefined
@@ -793,8 +862,34 @@ export type Database = {
         }
         Returns: boolean
       }
+      friend_action: {
+        Args: { _action: string; _target: string }
+        Returns: undefined
+      }
       is_game_participant: { Args: { _game_id: string }; Returns: boolean }
       is_room_member: { Args: { _room_id: string }; Returns: boolean }
+      list_friends: {
+        Args: never
+        Returns: {
+          avatar_key: string
+          frame_key: string
+          player_id: string
+          recipient_id: string
+          relationship_id: string
+          requester_id: string
+          status: string
+          username: string
+        }[]
+      }
+      search_players: {
+        Args: { _query: string }
+        Returns: {
+          avatar_key: string
+          frame_key: string
+          id: string
+          username: string
+        }[]
+      }
       shares_table_with: { Args: { _other: string }; Returns: boolean }
     }
     Enums: {

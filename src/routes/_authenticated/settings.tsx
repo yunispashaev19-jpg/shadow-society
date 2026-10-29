@@ -1,6 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -10,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
-import { updateProfile } from "@/lib/api.functions";
+import { NicknameForm } from "@/components/nickname-form";
 import { useAuth } from "@/lib/auth";
 import { LOCALES, PLANNED_LOCALES, useI18n } from "@/lib/i18n";
 
@@ -48,15 +47,12 @@ const DEFAULT_PREFS: Prefs = {
 
 function SettingsPage() {
   const { t, locale, setLocale } = useI18n();
-  const { session, profile, refreshProfile } = useAuth();
+  const { session, profile } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const saveProfile = useServerFn(updateProfile);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
   const [password, setPassword] = useState("");
-  const [username, setUsername] = useState("");
   const [busy, setBusy] = useState(false);
-  const [nameBusy, setNameBusy] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem(PREF_KEY);
@@ -91,23 +87,6 @@ function SettingsPage() {
     }
   }
 
-  async function changeUsername(e: React.FormEvent) {
-    e.preventDefault();
-    const next = username.trim();
-    if (!next || next === profile?.username) return;
-    setNameBusy(true);
-    try {
-      await saveProfile({ data: { username: next } });
-      await refreshProfile();
-      setUsername("");
-      toast.success("Username updated.");
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : t("common.error"));
-    } finally {
-      setNameBusy(false);
-    }
-  }
-
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
@@ -123,23 +102,8 @@ function SettingsPage() {
         <p className="text-sm text-muted-foreground">
           Signed in as <span className="text-foreground">{session?.user.email}</span>
         </p>
-        <form onSubmit={changeUsername} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-          <div className="flex-1 space-y-2">
-            <Label htmlFor="new-username">Username</Label>
-            <Input
-              id="new-username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder={profile?.username}
-              minLength={3}
-              maxLength={18}
-              autoComplete="nickname"
-            />
-          </div>
-          <Button type="submit" disabled={nameBusy}>
-            Change name
-          </Button>
-        </form>
+        <p className="break-all font-mono text-xs text-muted-foreground">{t("identity.id")}: {profile?.id}</p>
+        <NicknameForm />
         <form onSubmit={changePassword} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="flex-1 space-y-2">
             <Label htmlFor="new-password">New password</Label>

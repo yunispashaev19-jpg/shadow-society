@@ -87,10 +87,15 @@ export const updateProfile = createServerFn({ method: "POST" })
       if (!owned) throw new Error("You do not own that item.");
     }
 
+    if (data.username) {
+      const { data: renamed, error } = await context.supabase.rpc("change_nickname", { _nickname: data.username });
+      if (error) throw new Error(error.message);
+      if (!data.avatarKey && !data.frameKey) return renamed;
+    }
+
     const { data: updated, error } = await supabaseAdmin
       .from("profiles")
       .update({
-        ...(data.username ? { username: data.username } : {}),
         ...(data.avatarKey ? { avatar_key: data.avatarKey } : {}),
         ...(data.frameKey ? { frame_key: data.frameKey } : {}),
         updated_at: new Date().toISOString(),
