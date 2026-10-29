@@ -36,6 +36,13 @@
       "when": 1791194852600,
       "tag": "0004_coin_purchases",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1793268425845,
+      "tag": "0005_player_identity_and_friends",
+      "breakpoints": true
     }
   ]
 }
