@@ -10,4 +10,7 @@
 <!-- LOVABLE:END -->
 
 - Native store apps use Capacitor as a remote shell loading the published URL (capacitor.config.ts); why: the app is server-rendered, so a static bundle can't run it.
+- Nickname changes and friendship actions use authenticated database RPCs; nickname changes lock the profile and record a transaction, so identity uniqueness and charges cannot be bypassed or raced.
+- Player search and friend lists project only nickname, stable profile ID and cosmetics through authenticated RPCs; this keeps emails, balances and private profile fields out of discovery.
+- Profile and Settings share NicknameForm; this keeps rename pricing and payment confirmation consistent across entry points.
 - Managed social sign-in uses the generated Lovable helper with a public same-origin return URL; AuthProvider confirms the session before navigating to protected pages.

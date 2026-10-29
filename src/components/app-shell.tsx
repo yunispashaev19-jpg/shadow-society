@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Coins, Gamepad2, LayoutGrid, LogOut, Settings, ShoppingBag, Trophy, User } from "lucide-react";
+import { Coins, Gamepad2, LayoutGrid, LogOut, Settings, ShoppingBag, Trophy, User, Users } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { BrandMark } from "@/components/brand";
@@ -17,6 +17,7 @@ const NAV = [
   { to: "/leaderboard", icon: Trophy, key: "nav.leaderboard" },
   { to: "/shop", icon: ShoppingBag, key: "nav.shop" },
   { to: "/profile", icon: User, key: "nav.profile" },
+  { to: "/friends", icon: Users, key: "nav.friends" },
 ] as const;
 
 export function AppShell({ children, wide = false }: { children: ReactNode; wide?: boolean }) {
@@ -46,12 +47,12 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
             <BrandMark />
           </Link>
 
-          <nav className="ml-4 hidden items-center gap-1 md:flex">
+          <nav className="ml-4 hidden items-center gap-1 xl:flex">
             {NAV.map((item) => (
               <Link
                 key={item.to}
                 to={item.to}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
+                className="rounded-lg px-2 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-surface-2 hover:text-foreground"
                 activeProps={{ className: "bg-surface-2 text-foreground" }}
               >
                 {t(item.key)}
@@ -90,15 +91,15 @@ export function AppShell({ children, wide = false }: { children: ReactNode; wide
 
       <main
         className={cn(
-          "mx-auto w-full px-4 pb-28 pt-6 sm:px-6 md:pb-12",
+          "mx-auto w-full px-4 pb-28 pt-6 sm:px-6 xl:pb-12",
           wide ? "max-w-[1600px]" : "max-w-6xl",
         )}
       >
         {children}
       </main>
 
-      <nav className="glass fixed inset-x-0 bottom-0 z-40 border-x-0 border-b-0 pb-[env(safe-area-inset-bottom)] md:hidden">
-        <div className="grid grid-cols-5">
+      <nav className="glass fixed inset-x-0 bottom-0 z-40 border-x-0 border-b-0 pb-[env(safe-area-inset-bottom)] xl:hidden">
+        <div className="grid grid-cols-6">
           {NAV.map((item) => (
             <Link
               key={item.to}
