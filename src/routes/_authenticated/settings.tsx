@@ -91,6 +91,23 @@ function SettingsPage() {
     }
   }
 
+  async function changeUsername(e: React.FormEvent) {
+    e.preventDefault();
+    const next = username.trim();
+    if (!next || next === profile?.username) return;
+    setNameBusy(true);
+    try {
+      await saveProfile({ data: { username: next } });
+      await refreshProfile();
+      setUsername("");
+      toast.success("Username updated.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : t("common.error"));
+    } finally {
+      setNameBusy(false);
+    }
+  }
+
   async function signOut() {
     await queryClient.cancelQueries();
     queryClient.clear();
