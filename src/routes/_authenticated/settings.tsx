@@ -123,6 +123,23 @@ function SettingsPage() {
         <p className="text-sm text-muted-foreground">
           Signed in as <span className="text-foreground">{session?.user.email}</span>
         </p>
+        <form onSubmit={changeUsername} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+          <div className="flex-1 space-y-2">
+            <Label htmlFor="new-username">Username</Label>
+            <Input
+              id="new-username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder={profile?.username}
+              minLength={3}
+              maxLength={18}
+              autoComplete="nickname"
+            />
+          </div>
+          <Button type="submit" disabled={nameBusy}>
+            Change name
+          </Button>
+        </form>
         <form onSubmit={changePassword} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
           <div className="flex-1 space-y-2">
             <Label htmlFor="new-password">New password</Label>
