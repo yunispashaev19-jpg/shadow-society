@@ -48,12 +48,15 @@ const DEFAULT_PREFS: Prefs = {
 
 function SettingsPage() {
   const { t, locale, setLocale } = useI18n();
-  const { session } = useAuth();
+  const { session, profile, refreshProfile } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const saveProfile = useServerFn(updateProfile);
   const [prefs, setPrefs] = useState<Prefs>(DEFAULT_PREFS);
   const [password, setPassword] = useState("");
+  const [username, setUsername] = useState("");
   const [busy, setBusy] = useState(false);
+  const [nameBusy, setNameBusy] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem(PREF_KEY);
